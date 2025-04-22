@@ -1,0 +1,25 @@
+import cv2
+import os
+
+video_path = "patitos.mp4"
+output_dir = "frames_patito"
+os.makedirs(output_dir, exist_ok=True)
+
+cap = cv2.VideoCapture(video_path)
+frame_rate = 15  # Guarda una imagen cada 15 frames (ajustable)
+count = 0
+saved = 0
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+    if count % frame_rate == 0:
+        filename = f"{output_dir}/frame_{saved:03d}.jpg"
+        cv2.imwrite(filename, frame)
+        print("Guardado:", filename)
+        saved += 1
+    count += 1
+
+cap.release()
+print(f"\n✅ {saved} imágenes guardadas en la carpeta '{output_dir}'")
