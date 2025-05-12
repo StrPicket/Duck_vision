@@ -135,7 +135,7 @@ class Duck_Tracker:
     #----------------------------------------------------------------------
 
     def __init__(self,
-             model_adress: str = '/home/strpicket/Duck_Vision_Final/best.pt',  # Ruta al archivo de pesos del modelo YOLOv8
+             model_adress: str = '/home/strpicket/Duck_vision/best.pt',  # Ruta al archivo de pesos del modelo YOLOv8
              min_detection: float = 0.3,                                     # Umbral mínimo de confianza para aceptar una detección
              min_lenght_pixels: int = 20,                                    # Distancia mínima en píxeles entre detecciones para considerarlas distintas
              max_fps: int = 2083,                                            # Número máximo de fotogramas a procesar antes de detenerse
@@ -1004,7 +1004,7 @@ class Duck_Tracker:
         # Prepare VideoWriter for side-by-side output (original + overlay)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(
-            os.path.join(output_dir, "output_video.mp4"),
+            os.path.join(output_dir, "video_original.mp4"),
             fourcc,
             fps_input,
             (width * 2, height)
@@ -1083,7 +1083,7 @@ class Duck_Tracker:
             self.visualize_2d(self.last_frame)
             plt.savefig(os.path.join(output_dir, "final_frame_2d.png"))
             plt.close()
-            self.visualize_trajectories(os.path.join(output_dir, "trayectorias_patos.png"))
+            self.visualize_trajectories(os.path.join(output_dir, "duck_trajectories.png"))
 
         # 5) Export all tracking data to JSON
         self.save_all_data(os.path.join(output_dir, "tracking_data.json"))
@@ -1248,27 +1248,27 @@ def main():
     4) Saves the tracking data and a final trajectory plot
     """
     # 1) Path to YOLOv8 model weights
-    model_adress = r'/home/strpicket/Duck_Vision_Final/best.pt'
+    model_adress = r'/home/strpicket/Duck_vision/best.pt'
     
     # 2) Instantiate the tracker with configuration parameters
     tracker = Duck_Tracker(
         model_adress,             # Path to the YOLOv8 weights file
-        min_detection=0.3,        # Minimum confidence to accept a detection
-        min_lenght_pixels=20,     # Minimum pixel separation between detections
-        max_fps=2083,             # Maximum number of frames to process
-        max_ducks=7,              # Maximum ducks to track simultaneously
-        last_positions=30,        # History length for each track
-        max_pixels_lane=50,       # Pixel distance threshold for association
-        fps_tracking=20,          # Frames without detection before marking lost
-        lane_threshold=0.3,       # Re-identification similarity threshold
-        mat_summary=True,         # Whether to generate a final Matplotlib summary
-        keyframes=None            # Optional list of keyframe indices
+        min_detection = 0.3,        # Minimum confidence to accept a detection
+        min_lenght_pixels = 20,     # Minimum pixel separation between detections
+        max_fps = 2083,             # Maximum number of frames to process
+        max_ducks = 7,              # Maximum ducks to track simultaneously
+        last_positions = 30,        # History length for each track
+        max_pixels_lane = 50,       # Pixel distance threshold for association
+        fps_tracking = 20,          # Frames without detection before marking lost
+        lane_threshold = 0.3,       # Re-identification similarity threshold
+        mat_summary = True,         # Whether to generate a final Matplotlib summary
+        keyframes = None            # Optional list of keyframe indices
     )
 
     # 3) Prompt the user for a video path, fallback to default if empty
     video_path = input("Enter video path (or press Enter for default './DuckVideo.mp4'): ").strip()
     if not video_path:
-        video_path = r'/home/strpicket/Duck_Vision_Final/assets/DuckVideo.mp4'
+        video_path = r'/home/strpicket/Duck_vision/video_original.mp4'
 
     # 4) Verify existence and process the video
     if os.path.exists(video_path):
