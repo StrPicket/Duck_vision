@@ -29,102 +29,6 @@ from ultralytics import YOLO
 
 
 #----------------------------------------------------------------------
-# C L A S E   K A L M A N   F I L T E R
-#----------------------------------------------------------------------
-
-class KalmanFilter:
-
-    #----------------------------------------------------------------------
-    # FUNCTION INIT_KALMAN_FILTER
-    #----------------------------------------------------------------------
-
-    def __init__(self, delta_t: float = 1.0):
-        """
-        Construct a 2D Kalman Filter with state [x, y, vx, vy].
-
-        Args:
-            delta_t: Time interval between frames
-        """
-        # 1) SET TIME STEP
-        self.dt = delta_t
-
-        # 2) INITIAL STATE VECTOR [x, y, vx, vy]
-        self.state = np.zeros(4)
-
-        # 3) STATE TRANSITION MATRIX (A)
-        self.A = np.array([
-            [1, 0, delta_t, 0],
-            [0, 1, 0, delta_t],
-            [0, 0, 1,       0],
-            [0, 0, 0,       1]
-        ])
-
-        # 4) MEASUREMENT MATRIX (H)
-        self.H = np.array([
-            [1, 0, 0, 0],
-            [0, 1, 0, 0]
-        ])
-
-        # 5) PROCESS NOISE COVARIANCE (Q)
-        self.Q = np.eye(4) * 0.1
-
-        # 6) MEASUREMENT NOISE COVARIANCE (R)
-        self.R = np.eye(2) * 1.0
-
-        # 7) ESTIMATE ERROR COVARIANCE (P)
-        self.P = np.eye(4) * 1000
-
-
-    #----------------------------------------------------------------------
-    # FUNCTION FORECAST_STATE
-    #----------------------------------------------------------------------
-
-    def forecast_state(self) -> np.ndarray:
-        """
-        Forecast the next state using the motion model.
-
-        Returns:
-            np.ndarray: Predicted position vector [x, y].
-        """
-        # 1) PROPAGATE STATE: x_k = A · x_{k-1}
-        self.state = self.A @ self.state
-
-        # 2) PROPAGATE COVARIANCE: P_k = A · P_{k-1} · Aᵀ + Q
-        self.P = self.A @ self.P @ self.A.T + self.Q
-
-        # 3) RETURN MEASURED POSITION: z = H · x_k
-        return self.H @ self.state
-
-
-    #----------------------------------------------------------------------
-    # FUNCTION CORRECT_STATE
-    #----------------------------------------------------------------------
-
-    def correct_state(self, obs: np.ndarray) -> None:
-        """
-        Correct the state estimate using a new observation.
-
-        Args:
-            obs (np.ndarray): Observation vector [x, y].
-        """
-        # 1) Compute innovation covariance: S = H·P·Hᵀ + R
-        S = self.H @ self.P @ self.H.T + self.R
-        # 2) Compute Kalman gain: K = P·Hᵀ·S⁻¹
-        K = self.P @ self.H.T @ np.linalg.inv(S)
-
-        # 3) Compute innovation (measurement residual): y = z - H·x
-        innovation = obs - (self.H @ self.state)
-
-        # 4) Update state estimate: x = x + K·y
-        self.state = self.state + K @ innovation
-
-        # 5) Update error covariance: P = (I - K·H)·P
-        I = np.eye(self.P.shape[0])
-        self.P = (I - K @ self.H) @ self.P
-
-
-
-#----------------------------------------------------------------------
 # C L A S E   D U C K   T R A C K E R   
 #----------------------------------------------------------------------
 
@@ -1233,6 +1137,102 @@ class Duck_Tracker:
             plt.close()                                           # Close figure to free memory
         else:
             plt.show()                                            # Otherwise, display on screen
+
+
+#----------------------------------------------------------------------
+# C L A S E   K A L M A N   F I L T E R
+#----------------------------------------------------------------------
+
+class KalmanFilter:
+
+    #----------------------------------------------------------------------
+    # FUNCTION INIT_KALMAN_FILTER
+    #----------------------------------------------------------------------
+
+    def __init__(self, delta_t: float = 1.0):
+        """
+        Construct a 2D Kalman Filter with state [x, y, vx, vy].
+
+        Args:
+            delta_t: Time interval between frames
+        """
+        # 1) SET TIME STEP
+        self.dt = delta_t
+
+        # 2) INITIAL STATE VECTOR [x, y, vx, vy]
+        self.state = np.zeros(4)
+
+        # 3) STATE TRANSITION MATRIX (A)
+        self.A = np.array([
+            [1, 0, delta_t, 0],
+            [0, 1, 0, delta_t],
+            [0, 0, 1,       0],
+            [0, 0, 0,       1]
+        ])
+
+        # 4) MEASUREMENT MATRIX (H)
+        self.H = np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0]
+        ])
+
+        # 5) PROCESS NOISE COVARIANCE (Q)
+        self.Q = np.eye(4) * 0.1
+
+        # 6) MEASUREMENT NOISE COVARIANCE (R)
+        self.R = np.eye(2) * 1.0
+
+        # 7) ESTIMATE ERROR COVARIANCE (P)
+        self.P = np.eye(4) * 1000
+
+
+    #----------------------------------------------------------------------
+    # FUNCTION FORECAST_STATE
+    #----------------------------------------------------------------------
+
+    def forecast_state(self) -> np.ndarray:
+        """
+        Forecast the next state using the motion model.
+
+        Returns:
+            np.ndarray: Predicted position vector [x, y].
+        """
+        # 1) PROPAGATE STATE: x_k = A · x_{k-1}
+        self.state = self.A @ self.state
+
+        # 2) PROPAGATE COVARIANCE: P_k = A · P_{k-1} · Aᵀ + Q
+        self.P = self.A @ self.P @ self.A.T + self.Q
+
+        # 3) RETURN MEASURED POSITION: z = H · x_k
+        return self.H @ self.state
+
+
+    #----------------------------------------------------------------------
+    # FUNCTION CORRECT_STATE
+    #----------------------------------------------------------------------
+
+    def correct_state(self, obs: np.ndarray) -> None:
+        """
+        Correct the state estimate using a new observation.
+
+        Args:
+            obs (np.ndarray): Observation vector [x, y].
+        """
+        # 1) Compute innovation covariance: S = H·P·Hᵀ + R
+        S = self.H @ self.P @ self.H.T + self.R
+        # 2) Compute Kalman gain: K = P·Hᵀ·S⁻¹
+        K = self.P @ self.H.T @ np.linalg.inv(S)
+
+        # 3) Compute innovation (measurement residual): y = z - H·x
+        innovation = obs - (self.H @ self.state)
+
+        # 4) Update state estimate: x = x + K·y
+        self.state = self.state + K @ innovation
+
+        # 5) Update error covariance: P = (I - K·H)·P
+        I = np.eye(self.P.shape[0])
+        self.P = (I - K @ self.H) @ self.P
+
 
 
 #----------------------------------------------------------------------
