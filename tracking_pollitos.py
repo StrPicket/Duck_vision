@@ -135,7 +135,7 @@ class Duck_Tracker:
     #----------------------------------------------------------------------
 
     def __init__(self,
-             model_adress: str = '/home/strpicket/Duck_vision/best.pt',  # Ruta al archivo de pesos del modelo YOLOv8
+             model_adress: str = '/home/strpicket/Duck_vision/yolo.pt',  # Ruta al archivo de pesos del modelo YOLOv8
              min_detection: float = 0.3,                                     # Umbral mínimo de confianza para aceptar una detección
              min_lenght_pixels: int = 20,                                    # Distancia mínima en píxeles entre detecciones para considerarlas distintas
              max_fps: int = 2083,                                            # Número máximo de fotogramas a procesar antes de detenerse
@@ -1248,7 +1248,7 @@ def main():
     4) Saves the tracking data and a final trajectory plot
     """
     # 1) Path to YOLOv8 model weights
-    model_adress = r'/home/strpicket/Duck_vision/best.pt'
+    model_adress = r'/home/strpicket/Duck_vision/yolo.pt'
     
     # 2) Instantiate the tracker with configuration parameters
     tracker = Duck_Tracker(
