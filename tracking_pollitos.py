@@ -11,6 +11,7 @@
 # L I B R E R I A S
 #----------------------------------------------------------------------
 
+import random
 import cv2
 import glob
 import json
@@ -1137,7 +1138,6 @@ class Duck_Tracker:
             plt.close()                                           # Close figure to free memory
         else:
             plt.show()                                            # Otherwise, display on screen
-
 
 #----------------------------------------------------------------------
 # C L A S E   K A L M A N   F I L T E R
